@@ -9,7 +9,7 @@ namespace Command.Actions
     {
         private UnitController actorUnit;
         private UnitController targetUnit;
-         private bool isSuccessful;
+        private bool isSuccessful;
         public TargetType TargetType => TargetType.Enemy;
 
         public void PerformAction(UnitController actorUnit, UnitController targetUnit, bool isSuccessful)

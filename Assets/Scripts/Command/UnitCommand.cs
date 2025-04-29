@@ -26,20 +26,20 @@ public abstract class UnitCommand : ICommand
     public void SetActorUnit(UnitController actorUnit) => this.actorUnit = actorUnit;
 
     public void SetTargetUnit(UnitController targetUnit) => this.targetUnit = targetUnit;
+}
 
-    public struct CommandData
+public struct CommandData
+{
+    public int ActorUnitID;
+    public int TargetUnitID;
+    public int ActorPlayerID;
+    public int TargetPlayerID;
+
+    public CommandData(int ActorUnitID, int TargetUnitID, int ActorPlayerID, int TargetPlayerID)
     {
-        public int ActorUnitID;
-        public int TargetUnitID;
-        public int ActorPlayerID;
-        public int TargetPlayerID;
-
-        public CommandData(int ActorUnitID, int TargetUnitID, int ActorPlayerID, int TargetPlayerID)
-        {
-            this.ActorUnitID = ActorUnitID;
-            this.TargetUnitID = TargetUnitID;
-            this.ActorPlayerID = ActorPlayerID;
-            this.TargetPlayerID = TargetPlayerID;
-        }
+        this.ActorUnitID = ActorUnitID;
+        this.TargetUnitID = TargetUnitID;
+        this.ActorPlayerID = ActorPlayerID;
+        this.TargetPlayerID = TargetPlayerID;
     }
 }
