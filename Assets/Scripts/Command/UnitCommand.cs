@@ -18,6 +18,10 @@ public abstract class UnitCommand : ICommand
     public abstract void Execute();
 
     /// <summary>
+    /// Abstract method to undo the unit command. Must be implemented by concrete subclasses.
+    /// </summary>
+    public abstract void Undo();
+    /// <summary>
     /// Abstract method to determine whether the command will successfully hit its target.
     /// Must be implemented by concrete subclasses.
     /// </summary>
