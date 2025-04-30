@@ -1,3 +1,4 @@
+using Command.Main;
 using System.Collections.Generic;
 
 /// <summary>
@@ -29,4 +30,25 @@ public class CommandInvoker
     /// </summary>
     /// <param name="commandToRegister">The command to be registered.</param>
     public void RegisterCommand(ICommand commandToRegister) => commandRegistry.Push(commandToRegister);
+
+    /// <summary>
+    /// Check if the command registry is empty.
+    /// </summary>
+    /// <returns></returns>
+    private bool RegistryEmpty() => commandRegistry.Count == 0;
+
+    private bool CommandBelongsToActivePlayer()
+    {
+        return (commandRegistry.Peek() as UnitCommand).commandData.ActorPlayerID == GameService.Instance.PlayerService.ActivePlayerID;
+    }
+
+    /// <summary>
+    /// Undo the last executed command by popping it from the stack and invoking its undo action. 
+    /// </summary>
+    public void Undo()
+    {
+        if (!RegistryEmpty() && CommandBelongsToActivePlayer())
+            commandRegistry.Pop().Undo();
+    }
+
 }
