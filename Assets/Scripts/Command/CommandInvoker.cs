@@ -6,6 +6,16 @@ using System.Collections.Generic;
 /// </summary>
 public class CommandInvoker
 {
+    /// <summary>
+    /// Constructor for the CommandInvoker class. It subscribes to the replay button clicked event.
+    /// </summary>
+    public CommandInvoker() => SubscribeToEvents();
+
+    /// <summary>
+    /// Subscribe to the replay button clicked event to set the replay stack.
+    /// </summary>
+    private void SubscribeToEvents() => GameService.Instance.EventService.OnReplayButtonClicked.AddListener(SetReplayStack);
+    
     // A stack to keep track of executed commands.
     private Stack<ICommand> commandRegistry = new Stack<ICommand>();
 
@@ -51,4 +61,12 @@ public class CommandInvoker
             commandRegistry.Pop().Undo();
     }
 
+    /// <summary>
+    /// Set the replay stack by transferring the current command registry to the replay service and clearing the command registry.
+    /// </summary>
+    public void SetReplayStack()
+    {
+        GameService.Instance.ReplayService.SetCommandStack(commandRegistry);
+        commandRegistry.Clear();
+    }
 }
