@@ -1,4 +1,4 @@
-using Command.Actions;
+using Command.Commands;
 using Command.Main;
 
 namespace Command.Player
@@ -77,6 +77,20 @@ namespace Command.Player
             GameService.Instance.UIService.ShowBattleEndUI(winnerId);
         }
 
+        public void ProcessUnitCommand(UnitCommand commandToProcess)
+        {
+            SetUnitReferences(commandToProcess);
+            GetPlayerById(commandToProcess.commandData.ActorPlayerID).ProcessUnitCommand(commandToProcess);
+        }
+
+        private void SetUnitReferences(UnitCommand commandToProcess)
+        {
+            var actorUnit = GetPlayerById(commandToProcess.commandData.ActorPlayerID).GetUnitByID(commandToProcess.commandData.ActorUnitID);
+            var targetUnit = GetPlayerById(commandToProcess.commandData.TargetPlayerID).GetUnitByID(commandToProcess.commandData.TargetUnitID);
+            commandToProcess.SetActorUnit(actorUnit);
+            commandToProcess.SetTargetUnit(targetUnit);
+        }
+
         private PlayerController GetPlayerById(int playerId) 
         {
             if (player1.PlayerID == playerId)
@@ -93,26 +107,6 @@ namespace Command.Player
                 PlayerDied(player1);
             else if (player2.AllUnitsDead())
                 PlayerDied(player2);
-        }
-
-        public void ProcessUnitCommand(UnitCommand commandToProcess)
-        {
-            // Set unit references for the command.
-            SetUnitReferences(commandToProcess);
-
-            // Delegate unit command processing to the corresponding player.
-            GetPlayerById(commandToProcess.commandData.ActorPlayerID).ProcessUnitCommand(commandToProcess);
-        }
-
-        private void SetUnitReferences(UnitCommand commandToProcess)
-        {
-            // Get actor and target units based on the command data.
-            var actorUnit = GetPlayerById(commandToProcess.commandData.ActorPlayerID).GetUnitByID(commandToProcess.commandData.ActorUnitID);
-            var targetUnit = GetPlayerById(commandToProcess.commandData.TargetPlayerID).GetUnitByID(commandToProcess.commandData.TargetUnitID);
-
-            // Set the actor and target units for the command.
-            commandToProcess.SetActorUnit(actorUnit);
-            commandToProcess.SetTargetUnit(targetUnit);
         }
     }
 }

@@ -1,9 +1,10 @@
 using UnityEngine;
 using Command.Main;
-using Command.Actions;
+using Command.Commands;
 using System.Collections;
 using System;
 using Object = UnityEngine.Object;
+using Command.Actions;
 
 namespace Command.Player
 {
@@ -91,16 +92,16 @@ namespace Command.Player
             unitView.PlayAnimation(UnitAnimations.DEATH);
         }
 
-        public void PlayBattleAnimation(CommandType actionType, Vector3 battlePosition, Action callback)
+        public void PlayBattleAnimation(CommandType commandType, Vector3 battlePosition, Action callback)
         {
             GameService.Instance.UIService.ResetBattleBackgroundOverlay();
-            MoveToBattlePosition(battlePosition, callback, true, actionType);
+            MoveToBattlePosition(battlePosition, callback, true, commandType);
         }
 
-        private void MoveToBattlePosition(Vector3 battlePosition, Action callback = null,  bool shouldPlayActionAnimation = true, CommandType actionTypeToExecute = CommandType.None)
+        private void MoveToBattlePosition(Vector3 battlePosition, Action callback = null,  bool shouldPlayActionAnimation = true, CommandType commandTypeToExecute = CommandType.None)
         {
             float moveTime = Vector3.Distance(unitView.transform.position, battlePosition) / unitScriptableObject.MovementSpeed;
-            unitView.StartCoroutine(MoveToPositionOverTime(battlePosition, moveTime, callback, shouldPlayActionAnimation, actionTypeToExecute));
+            unitView.StartCoroutine(MoveToPositionOverTime(battlePosition, moveTime, callback, shouldPlayActionAnimation, commandTypeToExecute));
         }
 
         private IEnumerator MoveToPositionOverTime(Vector3 targetPosition, float time, Action callback, bool shouldPlayActionAnimation, CommandType actionTypeToExecute)
@@ -152,9 +153,12 @@ namespace Command.Player
             SetAliveState(UnitAliveState.ALIVE);
             unitView.PlayAnimation(UnitAnimations.IDLE);
         }
+
         public void Destroy() => UnityEngine.Object.Destroy(unitView.gameObject);
 
         public void ResetUnitIndicator() => unitView.SetUnitIndicator(false);
+
+        public void ProcessUnitCommand(UnitCommand commandToProcess) => GameService.Instance.CommandInvoker.ProcessCommand(commandToProcess);
 
         public Vector3 GetEnemyPosition() 
         {
@@ -163,8 +167,6 @@ namespace Command.Player
             else
                 return unitView.transform.position - unitScriptableObject.EnemyBattlePositionOffset;
         }
-
-        public void ProcessUnitCommand(UnitCommand commandToProcess) => GameService.Instance.CommandInvoker.ProcessCommand(commandToProcess);
     }
 
     public enum UnitUsedState

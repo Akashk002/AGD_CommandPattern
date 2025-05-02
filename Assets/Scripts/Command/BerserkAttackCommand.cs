@@ -1,32 +1,41 @@
-using Command.Main;
 using Command.Actions;
-using System.Collections;
-using System.Collections.Generic;
+using Command.Main;
 using UnityEngine;
 
-public class BerserkAttackCommand : UnitCommand
+namespace Command.Commands
 {
-    private bool willHitTarget;
-
-    public BerserkAttackCommand(CommandData commandData)
+    public class BerserkAttackCommand : UnitCommand
     {
-        this.commandData = commandData;
-        willHitTarget = WillHitTarget();
-    }
+        private bool willHitTarget;
+        private const float hitChance = 0.66f;
 
-    public override bool WillHitTarget() => true;
-
-    public override void Execute() => GameService.Instance.ActionService.GetActionByType(CommandType.BerserkAttack).PerformAction(actorUnit, targetUnit, willHitTarget);
-
-    public override void Undo()
-    {
-        if (willHitTarget)
+        public BerserkAttackCommand(CommandData commandData)
         {
-            if (!targetUnit.IsAlive())
-                targetUnit.Revive();
+            this.commandData = commandData;
+            willHitTarget = WillHitTarget();
+        }
 
-            targetUnit.RestoreHealth(actorUnit.CurrentPower);
+        public override void Execute() => GameService.Instance.ActionService.GetActionByType(CommandType.BerserkAttack).PerformAction(actorUnit, targetUnit, willHitTarget);
+
+        public override void Undo()
+        {
+            if (willHitTarget)
+            {
+                if (!targetUnit.IsAlive())
+                    targetUnit.Revive();
+
+                targetUnit.RestoreHealth(actorUnit.CurrentPower * 2);
+            }
+            else
+            {
+                if (!actorUnit.IsAlive())
+                    actorUnit.Revive();
+
+                actorUnit.RestoreHealth(actorUnit.CurrentPower * 2);
+            }
             actorUnit.Owner.ResetCurrentActiveUnit();
         }
+
+        public override bool WillHitTarget() => Random.Range(0f, 1f) < hitChance;
     }
 }

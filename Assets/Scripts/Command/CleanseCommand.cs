@@ -1,32 +1,35 @@
-using Command.Main;
 using Command.Actions;
-using System.Collections;
-using System.Collections.Generic;
+using Command.Main;
 using UnityEngine;
 
-public class CleanseCommand : UnitCommand
+namespace Command.Commands
 {
-    private bool willHitTarget;
-
-    public CleanseCommand(CommandData commandData)
+    public class CleanseCommand : UnitCommand
     {
-        this.commandData = commandData;
-        willHitTarget = WillHitTarget();
-    }
+        private bool willHitTarget;
+        private const float hitChance = 0.2f;
+        private int previousPower;
 
-    public override bool WillHitTarget() => true;
-
-    public override void Execute() => GameService.Instance.ActionService.GetActionByType(CommandType.Cleanse).PerformAction(actorUnit, targetUnit, willHitTarget);
-
-    public override void Undo()
-    {
-        if (willHitTarget)
+        public CleanseCommand(CommandData commandData)
         {
-            if (!targetUnit.IsAlive())
-                targetUnit.Revive();
+            this.commandData = commandData;
+            willHitTarget = WillHitTarget();
+        }
 
-            targetUnit.RestoreHealth(actorUnit.CurrentPower);
+        public override void Execute()
+        {
+            previousPower = targetUnit.CurrentPower;
+            GameService.Instance.ActionService.GetActionByType(CommandType.Cleanse).PerformAction(actorUnit, targetUnit, willHitTarget);
+        }
+
+        public override void Undo()
+        {
+            if (willHitTarget)
+                targetUnit.CurrentPower = previousPower;
+
             actorUnit.Owner.ResetCurrentActiveUnit();
         }
+
+        public override bool WillHitTarget() => Random.Range(0f, 1f) < hitChance;
     }
 }

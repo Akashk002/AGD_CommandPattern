@@ -1,32 +1,36 @@
-using Command.Main;
 using Command.Actions;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using Command.Main;
 
-public class MeditateCommand : UnitCommand
+namespace Command.Commands
 {
-    private bool willHitTarget;
-
-    public MeditateCommand(CommandData commandData)
+    public class MeditateCommand : UnitCommand
     {
-        this.commandData = commandData;
-        willHitTarget = WillHitTarget();
-    }
+        private bool willHitTarget;
+        private int previousMaxHealth;
 
-    public override bool WillHitTarget() => true;
-
-    public override void Execute() => GameService.Instance.ActionService.GetActionByType(CommandType.Meditate).PerformAction(actorUnit, targetUnit, willHitTarget);
-
-    public override void Undo()
-    {
-        if (willHitTarget)
+        public MeditateCommand(CommandData commandData)
         {
-            if (!targetUnit.IsAlive())
-                targetUnit.Revive();
+            this.commandData = commandData;
+            willHitTarget = WillHitTarget();
+        }
 
-            targetUnit.RestoreHealth(actorUnit.CurrentPower);
+        public override void Execute()
+        {
+            previousMaxHealth = targetUnit.CurrentMaxHealth;
+            GameService.Instance.ActionService.GetActionByType(CommandType.Meditate).PerformAction(actorUnit, targetUnit, willHitTarget);
+        }
+
+        public override void Undo()
+        {
+            if (willHitTarget)
+            {
+                var healthToReduce = targetUnit.CurrentMaxHealth - previousMaxHealth;
+                targetUnit.CurrentMaxHealth = previousMaxHealth;
+                targetUnit.TakeDamage(healthToReduce);
+            }
             actorUnit.Owner.ResetCurrentActiveUnit();
         }
+
+        public override bool WillHitTarget() => true;
     }
 }

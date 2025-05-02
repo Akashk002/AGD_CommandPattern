@@ -1,3 +1,4 @@
+using Command.Commands;
 using Command.Input;
 using Command.Main;
 using Command.Player;
@@ -7,10 +8,10 @@ namespace Command.Actions
 {
     public class BerserkAttackAction : IAction
     {
-        private const float hitChance = 0.66f;
         private UnitController actorUnit;
         private UnitController targetUnit;
         private bool isSuccessful;
+
         public TargetType TargetType => TargetType.Enemy;
 
         public void PerformAction(UnitController actorUnit, UnitController targetUnit, bool isSuccessful)
@@ -31,6 +32,7 @@ namespace Command.Actions
             else
             {
                 actorUnit.TakeDamage(actorUnit.CurrentPower * 2);
+                actorUnit.OnActionExecuted();
                 Debug.Log("actor unit must be hit now.");
             }
         }

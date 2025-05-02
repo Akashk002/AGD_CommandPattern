@@ -1,3 +1,4 @@
+using Command.Commands;
 using Command.Input;
 using Command.Main;
 using Command.Player;
@@ -12,7 +13,7 @@ namespace Command.Actions
         private bool isSuccessful;
         public TargetType TargetType => TargetType.Friendly;
 
-        public void PerformAction(UnitController actorUnit, UnitController targetUnit,bool isSuccessful)
+        public void PerformAction(UnitController actorUnit, UnitController targetUnit, bool isSuccessful)
         {
             this.actorUnit = actorUnit;
             this.targetUnit = targetUnit;

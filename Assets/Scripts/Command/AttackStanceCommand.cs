@@ -1,32 +1,29 @@
-using Command.Main;
 using Command.Actions;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using Command.Main;
 
-public class AttackStanceCommand : UnitCommand
+namespace Command.Commands
 {
-    private bool willHitTarget;
-
-    public AttackStanceCommand(CommandData commandData)
+    public class AttackStanceCommand : UnitCommand
     {
-        this.commandData = commandData;
-        willHitTarget = WillHitTarget();
-    }
+        private bool willHitTarget;
 
-    public override bool WillHitTarget() => true;
-
-    public override void Execute() => GameService.Instance.ActionService.GetActionByType(CommandType.AttackStance).PerformAction(actorUnit, targetUnit, willHitTarget);
-
-    public override void Undo()
-    {
-        if (willHitTarget)
+        public AttackStanceCommand(CommandData commandData)
         {
-            if (!targetUnit.IsAlive())
-                targetUnit.Revive();
-
-            targetUnit.RestoreHealth(actorUnit.CurrentPower);
-            actorUnit.Owner.ResetCurrentActiveUnit();
+            this.commandData = commandData;
+            willHitTarget = WillHitTarget();
         }
+
+        public override void Execute() => GameService.Instance.ActionService.GetActionByType(CommandType.AttackStance).PerformAction(actorUnit, targetUnit, willHitTarget);
+
+        public override void Undo()
+        {
+            if (willHitTarget)
+            {
+                targetUnit.CurrentPower -= (int)(targetUnit.CurrentPower * 0.2f);
+                actorUnit.Owner.ResetCurrentActiveUnit();
+            }
+        }
+
+        public override bool WillHitTarget() => true;
     }
 }
